@@ -1,0 +1,73 @@
+{
+    "name": "mohamedbakr57/localized-enum",
+    "description": "A simple and lightweight Laravel package that adds localized labels to native PHP enums using Laravel's translation system. Ideal for multi-language applications.",
+    "keywords": [
+        "Bakr",
+        "laravel",
+        "localized-enum"
+    ],
+    "homepage": "https://github.com/mohamedbakr57/localized-enum",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bakr",
+            "email": "mohamed.bakr741@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1 || ^8.2 || ^8.3",
+        "spatie/laravel-package-tools": "^1.16",
+        "illuminate/contracts": "^10.0 || ^11.0 || ^12.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-arch": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "orchestra/testbench": "^10.0 || ^11.0 || ^12.0",
+        "larastan/larastan": "^2.9 || ^3.0",
+        "phpstan/extension-installer": "^1.3 || ^2.0",
+        "phpstan/phpstan-deprecation-rules": "^1.1 || ^2.0",
+        "phpstan/phpstan-phpunit": "^1.3 || ^2.0",
+        "nunomaduro/collision": "^8.1.1 || ^7.10.0",
+        "laravel/pint": "^1.14"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bakr\\LocalizedEnum\\": "src/",
+            "Bakr\\LocalizedEnum\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Bakr\\LocalizedEnum\\Tests\\": "tests/",
+            "Workbench\\App\\": "workbench/app/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@composer run prepare",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Bakr\\LocalizedEnum\\LocalizedEnumServiceProvider"
+            ],
+            "aliases": {
+                "LocalizedEnum": "Bakr\\LocalizedEnum\\Facades\\LocalizedEnum"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
