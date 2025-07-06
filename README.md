@@ -1,24 +1,25 @@
 # Localized Enum for Laravel
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/mohamedbakr57/localized-enum.svg)](https://packagist.org/packages/mohamedbakr57/localized-enum)
-[![Tests](https://github.com/mohamedbakr57/localized-enum/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mohamedbakr57/localized-enum/actions)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/mohamedbakr57/localized-enum.svg)](https://packagist.org/packages/mohamedbakr57/localized-enum)  
+[![Tests](https://github.com/mohamedbakr57/localized-enum/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mohamedbakr57/localized-enum/actions)  
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Localized Enum** is a simple and lightweight Laravel package that enhances native PHP enums with localized labels using Laravel’s translation system. Ideal for multilingual applications where you want human-readable enum values.
+**Localized Enum** is a simple, lightweight Laravel package that adds localized labels to native PHP enums using Laravel’s translation system.  
+Perfect for multilingual applications and API responses with dynamic localization support.
 
 ---
 
 ## 📚 Table of Contents
 - [Usage](#-usage)
-    - [Basic Usage](#basic-usage)
-    - [With Custom Key](#with-custom-key-force-a-specific-key)
-    - [With Fallback Default](#with-fallback-default)
-    - [Without any key or translation](#without-any-key-or-translation)
+  - [Basic Usage](#basic-usage)
+  - [Custom Translation Key](#custom-translation-key)
+  - [Fallback Default](#fallback-default)
+  - [Locale from Request Header](#locale-from-request-header)
+  - [Override Header Key](#override-header-key)
 - [Features](#-features)
 - [Installation](#-installation)
+- [Example Translation File](#-example-translation-file)
 - [Testing](#-testing)
-- [Requirements](#-requirements)
-- [Example Output](#-example-output)
 - [Development](#-development)
 - [License](#-license)
 - [Credits](#-credits)
@@ -26,143 +27,130 @@
 ---
 ## 🧪 Usage
 
-This package adds a `label()` method to your native PHP enums, which will try to resolve a translated string using Laravel’s Lang system. It attempts the following keys in order:
-
-- `enums.{FQCN}.{name}`
-- `enums.{ClassBasename}.{name}`
-- `{FQCN}.{name}`
-- `{ClassBasename}.{name}`
-
-If no match is found, it falls back to a `Str::headline()` of the enum name (e.g., `'APPROVED'` → `'Approved'`).
-
 ### Basic Usage
 
 ```php
-TestStatus::Approved->label(); // "Approved by Admin"
+TestStatus::Approved->label(); 
+// Output: "Approved by Admin" (if translation exists)
 ```
 
-### With Custom Key (Force a specific key)
-
-You can override the translation key directly:
+### Custom Translation Key
 
 ```php
 TestStatus::Approved->label('custom.status.approved');
+// Output: value from that specific key
 ```
 
-### With Fallback Default
-
-Optionally, provide a default string if translation fails:
+### Fallback Default
 
 ```php
-TestStatus::Approved->label('missing.key', 'Fallback Approved');
-// Output: 'Fallback Approved'
+TestStatus::Approved->label('missing.key', 'Approved fallback');
+// Output: "Approved fallback" if translation not found
 ```
 
-### Without any key or translation
+### Locale from Request Header
 
-Fallbacks to a prettified enum name:
+If you're building an API and send locale via headers:
+
+```http
+GET /api/user
+X-Locale: ar
+```
+
+The trait will use the `X-Locale` value automatically.
+
+> 📝 Default header key is `X-Locale`, but it can be overridden.
+
+### Override Header Key
+
+If your app uses a different header, override the method in your enum:
 
 ```php
-TestStatus::Pending->label(); // "Pending"
+enum TestStatus: string
+{
+    use HasLabel;
+
+    protected function getLocaleHeaderKey(): string
+    {
+        return 'Accept-Language';
+    }
+}
 ```
+
+Or override `getLabelLocale()` entirely for full control.
 
 ---
 
 ## ✨ Features
 
-- 🔤 Translates PHP enums into localized labels
-- 🌐 Fully supports Laravel’s native translation system
-- 🔄 Supports multiple fallback strategies
-- 🔧 Clean, trait-based implementation
-- 🔁 Locale switching supported out-of-the-box
+- 🏷️ Adds `label()` method to native PHP Enums
+- 🌐 Fully supports Laravel’s translation system
+- 🧠 Smart fallback resolution (from multiple key patterns)
+- 🧪 Works great in API responses
+- 🔧 Easily override locale detection via request headers
+- 🔄 Defaults to `config('app.locale')` if no locale is sent
+- ⚡ Compatible with flat or nested translation files
 
 ---
 
 ## 📦 Installation
 
-Require the package via Composer:
-
 ```bash
 composer require mohamedbakr57/localized-enum
 ```
 
-No service provider registration is needed for Laravel 10+.
-
 ---
 
 
-## 🧪 Testing
+## 📌 Example Translation File
 
-To run the test suite:
-
-```bash
-composer test
+```php
+// lang/en/enums.php
+return [
+    'TestStatus.Approved' => 'Approved by Admin',
+    'TestStatus.Pending'  => 'Waiting',
+    'TestStatus.Rejected' => 'Rejected',
+];
 ```
 
-With coverage:
+Supports both:
 
-```bash
-composer test-coverage
-```
+- `enums.FQCN.CASE`
+- `enums.Basename.CASE`
+- `FQCN.CASE`
+- `Basename.CASE`
+- Or just: `'Approved' => 'Approved Label'` for flat key fallback
 
 ---
 
 ## ✅ Requirements
 
-- PHP ^8.1
-- Laravel ^10.0 | ^11.0 | ^12.0
+- PHP: ^8.1
+- Laravel: ^10.0, ^11.0, ^12.0
 
 ---
 
-## 📌 Example Output
+## 🧪 Testing
 
-With this enum:
-
-```php
-enum PaymentStatus: string
-{
-        use HasLabel;
-
-        case Paid = 'paid';
-        case Pending = 'pending';
-        case Failed = 'failed';
-}
+```bash
+composer test
+composer test-coverage
 ```
 
-And this translation file (`lang/en/enums.php`):
+Run Pint for formatting:
 
-```php
-return [
-        'PaymentStatus.Paid' => 'Payment Complete',
-        'PaymentStatus.Pending' => 'Awaiting Payment',
-        'PaymentStatus.Failed' => 'Payment Failed',
-];
-```
-
-You get:
-
-```php
-PaymentStatus::Paid->label();    // "Payment Complete"
-PaymentStatus::Pending->label(); // "Awaiting Payment"
-PaymentStatus::Failed->label();  // "Payment Failed"
+```bash
+composer format
 ```
 
 ---
 
 ## 🧰 Development
 
-Clone and work locally using Laravel Workbench:
-
 ```bash
 git clone https://github.com/mohamedbakr57/localized-enum.git
 cd localized-enum
 composer install
-```
-
-Run tests:
-
-```bash
-composer format
 composer test
 ```
 
@@ -170,11 +158,11 @@ composer test
 
 ## 📄 License
 
-Licensed under the [MIT license](LICENSE).
+Licensed under [MIT License](LICENSE)
 
 ---
 
 ## 🙌 Credits
 
-Developed and maintained by [Mohamed Bakr](https://github.com/mohamedbakr57). Contributions and PRs are welcome.
-
+Built and maintained by [Mohamed Bakr](https://github.com/mohamedbakr57)  
+Stars and PRs are welcome ⭐️
