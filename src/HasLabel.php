@@ -12,7 +12,6 @@ trait HasLabel
      *
      * @param  string|null  $key  Optional custom translation key.
      * @param  string|null  $default  Optional fallback value if no translation is found.
-     * @return string
      */
     public function label(?string $key = null, ?string $default = null): string
     {
