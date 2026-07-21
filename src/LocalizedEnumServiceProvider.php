@@ -2,7 +2,6 @@
 
 namespace Bakr\LocalizedEnum;
 
-use Bakr\LocalizedEnum\Commands\LocalizedEnumCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -25,9 +24,6 @@ class LocalizedEnumServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('localized-enum')
-            ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_localized_enum_table')
-            ->hasCommand(LocalizedEnumCommand::class);
+            ->hasConfigFile();
     }
 }

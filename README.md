@@ -63,7 +63,18 @@ The trait will use the `X-Locale` value automatically.
 
 ### Override Header Key
 
-If your app uses a different header, override the method in your enum:
+The default header is `X-Locale`. You can change it app-wide via config (after
+publishing with `php artisan vendor:publish --tag="localized-enum-config"`):
+
+```php
+// config/localized-enum.php
+return [
+    'header_key' => env('LOCALIZED_ENUM_HEADER_KEY', 'Accept-Language'),
+    'available_locales' => ['en', 'ar'], // optional whitelist; null trusts any header value
+];
+```
+
+Or override the method on a specific enum for per-enum control:
 
 ```php
 enum TestStatus: string
@@ -125,8 +136,8 @@ Supports both:
 
 ## ✅ Requirements
 
-- PHP: ^8.1
-- Laravel: ^10.0, ^11.0, ^12.0
+- PHP: ^8.1, ^8.2, ^8.3, ^8.4
+- Laravel: ^10.0, ^11.0, ^12.0, ^13.0
 
 ---
 

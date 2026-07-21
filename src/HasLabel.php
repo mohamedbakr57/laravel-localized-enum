@@ -20,23 +20,23 @@ trait HasLabel
         $basename = class_basename($class);
         $value = $this->name;
 
-        $keysToTry = [];
-
-        if ($key) {
-            $keysToTry[] = $key;
-        } else {
-            $keysToTry = [
-                "enums.{$class}.{$value}",
-                "enums.{$basename}.{$value}",
-                "{$class}.{$value}",
-                "{$basename}.{$value}",
-                $value,
-            ];
-        }
+        $keysToTry = $key ? [$key] : [
+            "enums.{$class}.{$value}",
+            "enums.{$basename}.{$value}",
+            "{$class}.{$value}",
+            "{$basename}.{$value}",
+            $value,
+        ];
 
         foreach ($keysToTry as $tryKey) {
-            if (Lang::has($tryKey, $locale)) {
-                return __($tryKey, [], $locale);
+            if (! Lang::has($tryKey, $locale)) {
+                continue;
+            }
+
+            $translated = __($tryKey, [], $locale);
+
+            if (is_string($translated)) {
+                return $translated;
             }
         }
 
@@ -49,19 +49,32 @@ trait HasLabel
      */
     protected function getLabelLocale(): string
     {
-        // Check for locale in request header (default: X-Locale)
-        $headerKey = $this->getLocaleHeaderKey();
-        $requestLocale = request()->header($headerKey);
+        $default = config('app.locale');
+        $requestLocale = request()->header($this->getLocaleHeaderKey());
 
-        return $requestLocale ?: config('app.locale');
+        if (! $requestLocale) {
+            return $default;
+        }
+
+        $availableLocales = config('localized-enum.available_locales');
+
+        // Without a configured whitelist, any locale value supplied by the
+        // client is trusted as-is (existing behavior for backwards compatibility).
+        if (empty($availableLocales)) {
+            return $requestLocale;
+        }
+
+        return in_array($requestLocale, $availableLocales, true) ? $requestLocale : $default;
     }
 
     /**
      * Define the request header key to be used for locale detection.
-     * Developers can override this method if they want to customize the header.
+     * Defaults to `localized-enum.header_key` config, falling back to `X-Locale`.
+     * Developers can override this method if they want to customize the header
+     * on a per-enum basis without touching the config.
      */
     protected function getLocaleHeaderKey(): string
     {
-        return 'X-Locale'; // You can override this method to change the header key
+        return config('localized-enum.header_key', 'X-Locale');
     }
 }
